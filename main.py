@@ -1,6 +1,6 @@
 import telebot
-import mysql.connector
 import configparser
+from Services.DatabaseHelper import DatabaseHelper
 
 
 config = configparser.ConfigParser()
@@ -15,21 +15,20 @@ def send_welcome(message):
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
-    # ID = message.chat.id
-    bot.reply_to(message, message.text + "\n")
+    bot.reply_to(message, message.text)
 
 
 if __name__ == '__main__':
-    cnx = mysql.connector.connect(host=config["DB"]["Host"], port=config["DB"]["Port"], user=config["DB"]["User"], passwd=config["DB"]["Password"], db=config["DB"]["Name"])
-    cursor = cnx.cursor()
-    query = "select Name from roles"
+    dbHelper = DatabaseHelper()
+    dbHelper.open_connection()
+    query = ""
 
-    cursor.execute(query)
+    cursor = dbHelper.execute_query(query)
 
     for Name in cursor:
         print(Name)
 
-    cursor.close()
-    cnx.close()
+    print(cursor.column_names)
+    dbHelper.close_connection()
 
     bot.polling(none_stop=True)
