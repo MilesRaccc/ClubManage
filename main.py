@@ -1,6 +1,8 @@
 import telebot
 import configparser
-from Services.DatabaseHelper import DatabaseHelper
+import logging
+from Helpers.DatabaseHelper import DatabaseHelper
+from Classes.Enums import Roles
 
 
 config = configparser.ConfigParser()
@@ -19,16 +21,20 @@ def echo_all(message):
 
 
 if __name__ == '__main__':
-    dbHelper = DatabaseHelper()
-    dbHelper.open_connection()
-    query = ""
+    log_level = logging.DEBUG
+    log_fmt = '[%(levelname)s] %(asctime)s - %(message)s'
+    logging.basicConfig(level=log_level, format=log_fmt)
+    admin_dict = Roles.Admin.value
+    logging.info(admin_dict[0])
 
-    cursor = dbHelper.execute_query(query)
+    DatabaseHelper.open_connection()
+    query = "Select Name from roles"
+
+    cursor = DatabaseHelper.execute_query(query)
 
     for Name in cursor:
-        print(Name)
+        logging.info(Name)
 
-    print(cursor.column_names)
-    dbHelper.close_connection()
+    DatabaseHelper.close_connection()
 
     bot.polling(none_stop=True)
